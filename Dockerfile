@@ -9,31 +9,26 @@ RUN set -eux && cargo install --locked monolith
 # Stage: main-app
 # Purpose: Compiles the frontend and
 # Notes:
-#  - Nothing extra should be left here.  All commands should cleanup
+#  - Nothing extra should be left here. All commands should cleanup
 FROM node:20.19.6-bullseye-slim AS main-app
 
 ENV YARN_HTTP_TIMEOUT=10000000
-
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-
 ENV PRISMA_HIDE_UPDATE_MESSAGE=1
-
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir /data
-
 WORKDIR /data
 
-RUN corepack enable
+# --- FIX APPLIED HERE ---
+# The slim version of Node 20.19+ is missing the corepack.cjs file by default.
+# We must reinstall corepack globally via npm to restore the missing files before enabling it.
+RUN npm install -g corepack@latest && corepack enable
 
 COPY ./.yarnrc.yml ./
-
 COPY ./apps/web/package.json ./apps/web/playwright.config.ts ./apps/web/
-
 COPY ./apps/worker/package.json ./apps/worker/
-
 COPY ./packages ./packages
-
 COPY ./yarn.lock ./package.json ./
 
 RUN --mount=type=cache,sharing=locked,target=/usr/local/share/.cache/yarn \

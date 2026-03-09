@@ -1,28 +1,35 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    env_file: .env
-    restart: always
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
   linkwarden:
-    env_file: .env
-    environment:
-      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    build: . # <-- Changed from 'image' to 'build: .' to use the local Dockerfile
+    container_name: Linkwarden-WEB
     restart: always
-    # build: . # uncomment to build from source
-    image: ghcr.io/linkwarden/linkwarden:latest # comment to build from source
     ports:
-      - 3000:3000
+      - 3100:3000
     volumes:
       - ./data:/data/data
     depends_on:
       - postgres
       - meilisearch
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: Linkwarden-POSTGRES
+    restart: always
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
   meilisearch:
     image: getmeili/meilisearch:v1.12.8
+    container_name: Linkwarden-MEILI
     restart: always
-    env_file:
-      - .env
     volumes:
       - ./meili_data:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
