@@ -1,6 +1,6 @@
 services:
   linkwarden:
-    build: . # <-- Changed from 'image' to 'build: .' to use the local Dockerfile
+    build: .
     container_name: Linkwarden-WEB
     restart: always
     ports:
@@ -11,25 +11,26 @@ services:
       - postgres
       - meilisearch
     environment:
-      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
+      - NEXTAUTH_URL=http://localhost:3100
+      - NEXTAUTH_SECRET=nextauth
 
   postgres:
     image: postgres:16-alpine
     container_name: Linkwarden-POSTGRES
     restart: always
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB:linkwarden
+      - POSTGRES_USER:linkwarden
+      - POSTGRES_PASSWORD:password
 
   meilisearch:
     image: getmeili/meilisearch:v1.12.8
     container_name: Linkwarden-MEILI
     restart: always
     volumes:
-      - ./meili_data:/meili_data
+      - ./meili:/meili_data
     environment:
-      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_MASTER_KEY=meili
