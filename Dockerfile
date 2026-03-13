@@ -22,7 +22,7 @@ FROM node:22-bullseye-slim
 ENV YARN_HTTP_TIMEOUT=10000000
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV PRISMA_HIDE_UPDATE_MESSAGE=1
-ENV DEBIAN_FRONTEND=noninteractive
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 WORKDIR /opt/linkwarden
 
@@ -53,7 +53,7 @@ RUN set -eux; \
     corepack prepare "yarn@${yarn_ver}" --activate
 
 # Install dependencies
-RUN yarn
+RUN yarn workspaces focus linkwarden @linkwarden/web @linkwarden/worker
 
 # Install playwright dependencies (required by Linkwarden)
 RUN npx playwright install-deps
