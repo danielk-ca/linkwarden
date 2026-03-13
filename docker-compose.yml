@@ -11,7 +11,7 @@ services:
       - postgres
       - meilisearch
     environment:
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/postgres
       - NEXTAUTH_URL=http://localhost:3100
       - NEXTAUTH_SECRET=nextauth
 
@@ -24,7 +24,7 @@ services:
     environment:
       - POSTGRES_DB:linkwarden
       - POSTGRES_USER:linkwarden
-      - POSTGRES_PASSWORD:password
+      - POSTGRES_PASSWORD:postgrespassword
 
   meilisearch:
     image: getmeili/meilisearch:v1.12.8
